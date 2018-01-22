@@ -49,3 +49,19 @@ plot_method_means(fit.initial, "Normal Model")
 ```
 
 We can see that we are very confident that the back hold is superior. We think there is a `r back_superiority_probability(fit.initial)` chance that the back hold truly is superior, and the mean estimate of the difference is `r back_superiority_distance(fit.initial)` meters.
+
+## Lognormal Model
+
+We can try to refine the model further by changing the distribution we use to model distances. It seems safe to assume that (barring gross negligence on the part of the operator), distance will be a strictly positive quantity. Furthermore, the skill and strength of the thrower may have an effect on the distance thrown. Therefore, it may be more sensible to model distance as having a lognormal distribution. A plot of this posterior distribution of the estimated effect is shown below.
+
+```{r lognormal_model, include=FALSE}
+stan.log.throws <- throws_to_stan_data(throws, log.distance=TRUE)
+fit.lognormal <- stan(file="models/01_normal.stan",
+                      data=stan.log.throws)
+```
+
+```{r lognormal_output, echo=FALSE}
+plot_method_means(fit.lognormal, "Lognormal Model", log.scale=TRUE)
+```
+
+With the lognormal model, there is a `r back_superiority_probability(fit.lognormal)` chance that the back hold truly is superior, and the mean estimate of the difference is `r back_superiority_percent(fit.lognormal)`.
