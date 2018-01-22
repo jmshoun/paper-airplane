@@ -1,0 +1,51 @@
+---
+title: "Paper Airplane Throwing Techniques"
+author: "Mark Shoun"
+date: "January 20, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(rstan)
+
+source("utils/data.R")
+source("utils/plot.R")
+source("utils/metrics.R")
+```
+
+## Introduction
+
+Cellulose-bsaed aviation is a popular recreational activity, and but some fundamental questions in the field have yet to be answered satisfactorily. G. S. Kaplan, an underunderunderundergraduate researcher affiliated with Hawthorne Elementary School in Salt Lake City, Utah, has performed some experiments on how one holds a paper airplane affects the distance it travels. He has been kind enough to share his raw data with me, and I will analyze it.
+
+The experiment consists of 50 consecutive trials of throwing a paper airplane. Prior to each trial, he flipped a coin to determine whether to hold the airplane at the front or back. After holding it in the appropriate manner and throwing it, he measured the distance it traveled. A plot of the raw data is shown below.
+
+```{r raw_plot, echo=FALSE, message=FALSE}
+throws <- load_throws()
+
+ggplot(throws) + 
+  aes(x=trial, y=log(distance), color=method) +
+  geom_point() + 
+  coord_cartesian(ylim=c(0, 10)) +
+  labs(x="Trial Number", y="Distance (meters)", color="Throwing\nMethod") +
+  theme_bw()
+```
+
+## Initial Model
+
+Perhaps the simplest possible model of our process is as follows: the distance a paper airplane flies is distributed normally with some mean, which may vary by the manner $m$ in which the airplane is held. This leads directly to the generative model $d \sim \mathcal{N}(\mu_m, \sigma^2_m)$. We can assume relatively noninformative priors and fit this model directly in Stan.
+
+```{r first_model, echo=FALSE}
+stan.throws <- throws_to_stan_data(throws)
+fit.initial <- stan(file="models/01_normal.stan",
+                    data=stan.throws)
+```
+
+A plot of the posterior distribution of the estimated difference between distance achieved by front and back holds is shown below.
+```{r first_model_output, echo=FALSE}
+plot_method_means(fit.initial, "Normal Model")
+```
+
+We can see that we are very confident that the back hold is superior. We think there is a `r back_superiority_probability(fit.initial)` chance that the back hold truly is superior, and the mean estimate of the difference is `r back_superiority_distance(fit.initial)` meters.
