@@ -26,7 +26,7 @@ The experiment consists of 50 consecutive trials of throwing a paper airplane. P
 throws <- load_throws()
 
 ggplot(throws) + 
-  aes(x=trial, y=log(distance), color=method) +
+  aes(x=trial, y=distance, color=method) +
   geom_point() + 
   coord_cartesian(ylim=c(0, 10)) +
   labs(x="Trial Number", y="Distance (meters)", color="Throwing\nMethod") +
