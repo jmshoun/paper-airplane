@@ -37,7 +37,7 @@ ggplot(throws) +
 
 Perhaps the simplest possible model of our process is as follows: the distance a paper airplane flies is distributed normally with some mean, which may vary by the manner $m$ in which the airplane is held. This leads directly to the generative model $d \sim \mathcal{N}(\mu_m, \sigma^2_m)$. We can assume relatively noninformative priors and fit this model directly in Stan.
 
-```{r first_model, echo=FALSE}
+```{r first_model, include=FALSE}
 stan.throws <- throws_to_stan_data(throws)
 fit.initial <- stan(file="models/01_normal.stan",
                     data=stan.throws)
